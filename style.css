@@ -1,0 +1,60 @@
+*{
+     padding: 0px;
+     margin: 0px;
+     box-sizing: border-box;
+}
+body{
+     background-color: #212121;
+     color: #fff;
+}
+.scoreboard{
+     color: #ffdfdf;
+     font: 600 25px ;
+     font-family: sans-serif;
+     position: fixed;
+     top: 5%;
+     left: 5%;
+     display: none;
+}
+form{
+     background-color: gray;
+     height: 55vh;
+     width: 55vw;
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translateX(-50%) translateY(-50%);
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     border-radius: 6px;
+}
+form >select,form select option{
+  padding: 10px;   
+  width: 20vw;
+  text-align: center;
+  font-size: 2vmax;
+  font-family: cursive;
+  transition: all 0.5s;
+ border: 2px solid rgb(18, 17, 17);
+ cursor: pointer;
+}
+
+form >input{
+     margin: 2vmax;
+     padding: 15px;
+     width: 20vw;
+     cursor: pointer;
+     background-color:indianred;
+     font-size: 20px;
+     border-radius: 5px;
+     border: none;
+}
+form >select:hover{
+     box-shadow: 0 0 20px white;
+}
+form >input:hover{
+     background-color: red;
+     box-shadow: 0 0 20px white;
+}
