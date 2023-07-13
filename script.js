@@ -6,7 +6,9 @@ canvas.width=innerWidth
 const context= canvas.getContext('2d');
 // =======---Main function Here-------============-----
 
-const difficulty=2;
+let  difficulty=2;
+const lightdamage=10;
+const heavydamage=20;
 const form =document.querySelector("form");
 const scoreboard=document.querySelector(".scoreboard");
 document.querySelector(".play-key").addEventListener("click",(e)=>{
@@ -16,19 +18,19 @@ document.querySelector(".play-key").addEventListener("click",(e)=>{
      const uservalue=document.getElementById("difficulty").value;
      if(uservalue==="Easy"){
           setInterval(SpameEnemy,2000)
-          return(difficulty=4)
+          return(difficulty=3)
      };
      if(uservalue==="Medium"){
           setInterval(SpameEnemy,1500)
-          return(difficulty=7)
+          return(difficulty=4)
      };
      if(uservalue==="Hard"){
           setInterval(SpameEnemy,1200)
-          return(difficulty=9)
+          return(difficulty=5)
      };
      if(uservalue==="Insane"){
           setInterval(SpameEnemy,1000)
-          return(difficulty=11)
+          return(difficulty=8)
      };
 })
 //====-- fixed player position----===
@@ -41,10 +43,10 @@ const playerposition={
 
 //=====--here player class--===
 class Player{
-     constructor(redius,x,y,color){
-          this.redius=redius;
+     constructor(x,y,redius,color){
           this.x=x;
           this.y=y;
+          this.redius=redius;
           this.color=color;
      };
      draw(){
@@ -62,15 +64,16 @@ class Player{
      }
 };
 
-const player1=new Player( 16,playerposition.x,playerposition.y, "red");
+const player1=new Player(playerposition.x,playerposition.y,16,"red");
 //=======---here weapon class======================//
 class Weapon{
-     constructor(redius,x,y,color,velocity){
-          this.redius=redius;
+     constructor(x,y,redius,color,velocity,damage){
           this.x=x;
           this.y=y;
+          this.redius=redius;
           this.color=color;
           this.velocity=velocity;
+          this.damage=damage;
      };
      draw(){
           context.beginPath();
@@ -93,9 +96,9 @@ class Weapon{
 //====================--here enemy class----========-----===---=--=----===
 class Enemy{
      constructor(x,y,redius,color,velocity){
-          this.redius=redius;
           this.x=x;
           this.y=y;
+          this.redius=redius;
           this.color=color;
           this.velocity=velocity;
      };
@@ -117,13 +120,51 @@ class Enemy{
          (this.x+= this.velocity.x), (this.y+= this .velocity.y) 
      }
 };
-//=====---creating weaponsArray,enemirsArray-===
+//===---here particals class---===
+
+class Partical{
+     constructor(x,y,redius,color,velocity){
+          this.x=x;
+          this.y=y;
+          this.redius=redius;
+          this.color=color;
+          this.velocity=velocity;
+          this.alpha=1
+     };
+     draw(){
+          context.save();
+          context.globalAlpha=this.alpha;
+          context.beginPath();
+          context.arc(
+               this.x,
+               this.y,
+               this.redius,
+               (Math.PI/180)*0,
+               (Math.PI/180)*360,
+               false,
+          )
+          context.fillStyle=this.color;
+          context.fill();
+          context.restore();
+          
+     };
+     update(){
+          this.draw();
+          this.x+= this.velocity.x,
+          this.y+= this .velocity.y,
+          this.alpha -= 0.01; 
+     }
+};
+//=====---creating weaponsArray,enemirsArray,ParticlasArray-===
 const weapons=[];
 const enmies =[];
+const particals=[];
+
+let enmycolor
 const SpameEnemy=()=>{
      //==--creating random size and color for enemies--====
      const enmysize=Math.random()*(40-5)+5;
-     const enmycolor=`hsl(${Math.floor(Math.random()*36000)},100%,40%)`;
+      enmycolor=`hsl(${Math.floor(Math.random()*360)},100%,40%)`;
      let random;
      if(Math.random()<0.5){
           random={
@@ -148,7 +189,7 @@ const SpameEnemy=()=>{
 
      enmies.push(new Enemy(random.x,random.y,enmysize,enmycolor,velocity))
 }
-//====--- main logic here---===
+//====--- main logic here-  addevent listener for lightweapon--===
 canvas.addEventListener('click',(e)=>{
      const MyAngle= Math.atan2(
           e.clientY-canvas.height/2,
@@ -159,20 +200,52 @@ canvas.addEventListener('click',(e)=>{
           y:Math.sin(MyAngle)*difficulty, 
      };
      weapons.push(new Weapon(
-          5,
           canvas.width/2,
           canvas.height/2,
+          6,
           "white",
-          velocity
+          velocity,
+          lightdamage
+
+     ))
+})
+
+//====--- main logic here-  addevent listener for heavyweapon--===
+canvas.addEventListener('contextmenu',(e)=>{
+     e.preventDefault();
+     const MyAngle= Math.atan2(
+          e.clientY-canvas.height/2,
+          e.clientX-canvas.width/2,          
+     );
+     const velocity={
+          x:Math.cos(MyAngle)*difficulty,
+          y:Math.sin(MyAngle)*difficulty, 
+     };
+     weapons.push(new Weapon(
+          canvas.width/2,
+          canvas.height/2,
+          12,
+          "pink",
+          velocity,
+          heavydamage
+
      ))
 })
 //====---animation function here--====
 let InimationId
 function animation(){
   InimationId= requestAnimationFrame(animation);
-  context.fillStyle="rgba(40,40,40,0.)"   
+  context.fillStyle="rgba(45,45,45,0.3)"   
    context.fillRect(0,0,canvas.width,canvas.height)
      player1.draw();
+     //===---creating particals--=====
+     particals.forEach((partical,particalindex)=>{
+          if(this.alpha<=0){
+               particals.splice(particalindex,1)
+          }else{
+          partical.update();
+          }
+     })
      weapons.forEach((Weapon,WeaponIndex)=>{
       Weapon.update();
       
@@ -190,6 +263,7 @@ function animation(){
                     player1.x-enemy.x,
                     player1.y-enemy.y
                   )
+                  //===--here end game if enemy hit player====---
                   if(Distance-player1.redius-enemy.redius<1){
                     cancelAnimationFrame(InimationId);
                   }
@@ -198,14 +272,29 @@ function animation(){
           weapon.x-enemy.x,
           weapon.y-enemy.y
         )
-        if(distance-weapon.redius-enemy.redius<1){
-          if(enemy.redius>18){
-     
+        if(distance-weapon.redius-enemy.redius<1) {
+          if(enemy.redius>20){
+          enemy.redius-= 15
+          weapons.splice(weaponIndex,1)
           }
+       else{ 
+          for(let i=0;i<10;i++){
+               particals.push(new Partical(
+                weapon.x,
+                weapon.y,
+                2,
+                enmycolor,
+                {
+                x: (Math.random() - 0.5)*(Math.random()*20),
+                y: (Math.random() - 0.5)*(Math.random()*20)
+                }
+                ))
+            }
         setTimeout(()=>{
           weapons.splice(weaponIndex,1)
           enmies.splice(enemyIndex,1)
         },0)
+     }
         }})
      })
 
