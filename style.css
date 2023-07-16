@@ -8,8 +8,11 @@ body{
      color: #fff;
 }
 .scoreboard{
-     color: #ffdfdf;
-     font: 600 25px ;
+     color:rgb(54, 52, 52);
+      font-size: 35px;
+      font-weight: 700;
+      background-color:#fffcfc;
+      border-radius: 10px;
      font-family: sans-serif;
      position: fixed;
      top: 5%;
@@ -35,7 +38,7 @@ form >select,form select option{
   width: 20vw;
   text-align: center;
   font-size: 2vmax;
-  font-family: cursive;
+  font-family: sans-serif;
   transition: all 0.5s;
  border: 2px solid rgb(18, 17, 17);
  cursor: pointer;
@@ -43,12 +46,12 @@ form >select,form select option{
 
 form >input{
      margin: 2vmax;
-     padding: 15px;
+     padding: 10px;
      width: 20vw;
      cursor: pointer;
      background-color:indianred;
-     font-size: 20px;
-     border-radius: 5px;
+     font-size: 25px;
+     border-radius: 8px;
      border: none;
 }
 form >select:hover{
@@ -58,3 +61,34 @@ form >input:hover{
      background-color: red;
      box-shadow: 0 0 20px white;
 }
+
+.Game-Over{
+     background-color: rgb(51, 48, 48);
+     border-radius: 20px;
+     position: fixed;
+     top: 50%;
+     left: 50%;
+     height: 100vh;
+     width: 100vw;
+     transform: translateX(-50%) translateY(-50%);
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+}
+.Game-Over >button{
+     padding: 0.5vmax;
+     border: 4px solid rgb(209, 198, 198);
+     cursor: pointer;
+     width: 15vw;
+     background-color: #fff;
+     font: 700 20px cursive;
+     transition: all 0.4s;
+     
+}
+.Game-Over >button:hover{
+     background-color:rgb(23, 22, 22);
+     color: #fff;
+     box-shadow: 0 0 10px rgb(209, 198, 198);
+}
+
