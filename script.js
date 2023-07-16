@@ -1,4 +1,4 @@
-//==---basic Enviroment Setup==----
+﻿//==---basic Enviroment Setup==----
 const canvas=document.createElement("canvas");
 document.querySelector(".MyGame").appendChild(canvas);
 canvas.height=innerHeight;
@@ -6,9 +6,11 @@ canvas.width=innerWidth
 const context= canvas.getContext('2d');
 // =======---Main function Here-------============-----
 
-let  difficulty=2;
+let  difficulty=21;
 const lightdamage=10;
 const heavydamage=20;
+const huagedamage=50;
+let playerscore=0
 const form =document.querySelector("form");
 const scoreboard=document.querySelector(".scoreboard");
 document.querySelector(".play-key").addEventListener("click",(e)=>{
@@ -22,24 +24,56 @@ document.querySelector(".play-key").addEventListener("click",(e)=>{
      };
      if(uservalue==="Medium"){
           setInterval(SpameEnemy,1500)
-          return(difficulty=4)
+          return(difficulty=5)
      };
      if(uservalue==="Hard"){
           setInterval(SpameEnemy,1200)
-          return(difficulty=5)
+          return(difficulty=7)
      };
      if(uservalue==="Insane"){
           setInterval(SpameEnemy,1000)
-          return(difficulty=8)
+          return(difficulty=9)
      };
 })
+
+//===--creating endscreen div and play-again==---=
+const gameoverloader=()=>{
+const gameoverbanner=document.createElement("div");
+const gameoverbutton=document.createElement("button");
+const highscore= document.createElement("div");
+
+highscore.innerHTML=`High-Score:${
+     localStorage.getItem("highscore")
+     ?localStorage.getItem("highscore")
+     :playerscore}`;
+
+const oldhighscore= 
+localStorage.getItem("highscore")&&localStorage.getItem("highscore")
+if(oldhighscore<playerscore){
+     localStorage.setItem("highscore", playerscore);
+       //===--updating playerscore in scoreboard in html--==
+       scoreboard.innerHTML=`Score:${playerscore}`
+}
+//==-=-adding text to playagain button==---
+gameoverbutton.innerHTML='Play-Again';
+gameoverbanner.appendChild(highscore);
+gameoverbanner.appendChild(gameoverbutton); 
+
+//==---makeing reload on clicking playagain button==--
+gameoverbutton.onclick=()=>{
+     window.location.reload();
+}
+gameoverbanner.classList.add("Game-Over");
+document.querySelector("body").appendChild(gameoverbanner);
+}
+
 //====-- fixed player position----===
 const playerposition={
      x:canvas.width/2,
      y:canvas.height/2
 }
 
-//====---creating classes player,enmy,Weapon===--
+//====---creating classes player,enmy,Weapon,Huageweapon===--
 
 //=====--here player class--===
 class Player{
@@ -63,8 +97,8 @@ class Player{
           context.fill();
      }
 };
-
-const player1=new Player(playerposition.x,playerposition.y,16,"red");
+//===--creating a player here===--
+const player1=new Player(playerposition.x,playerposition.y,18,"red");
 //=======---here weapon class======================//
 class Weapon{
      constructor(x,y,redius,color,velocity,damage){
@@ -88,9 +122,30 @@ class Weapon{
           context.fillStyle=this.color;
           context.fill();
      };
+     
      update(){
           this.draw();
-         (this.x+= this.velocity.x), (this.y+= this .velocity.y) 
+         (this.x+= this.velocity.x), 
+         (this.y+= this .velocity.y) 
+     }
+};
+//====--here hugeweapon class--====
+class HuageWeapon{
+     constructor(x,y,damage){
+          this.x=x;
+          this.y=y;
+          this.color="green";
+          this.damage=damage;
+     };
+     draw(){
+          context.beginPath();
+          context.fillRect(this.x,this.y,200,canvas.height)
+          context.fillStyle=this.color;
+          context.fill();
+     };
+     update(){
+          this.draw();
+         this.x += 30
      }
 };
 //====================--here enemy class----========-----===---=--=----===
@@ -117,7 +172,8 @@ class Enemy{
      };
      update(){
           this.draw();
-         (this.x+= this.velocity.x), (this.y+= this .velocity.y) 
+         (this.x+= this.velocity.x),
+          (this.y+= this .velocity.y) 
      }
 };
 //===---here particals class---===
@@ -155,8 +211,9 @@ class Partical{
           this.alpha -= 0.01; 
      }
 };
-//=====---creating weaponsArray,enemirsArray,ParticlasArray-===
+//=====---creating weaponsArray huageweaponArray,enemirsArray,ParticlasArray-===
 const weapons=[];
+const huageweapons=[];
 const enmies =[];
 const particals=[];
 
@@ -189,7 +246,7 @@ const SpameEnemy=()=>{
 
      enmies.push(new Enemy(random.x,random.y,enmysize,enmycolor,velocity))
 }
-//====--- main logic here-  addevent listener for lightweapon--===
+//====--- main logic here addevent listener for lightweapon--===
 canvas.addEventListener('click',(e)=>{
      const MyAngle= Math.atan2(
           e.clientY-canvas.height/2,
@@ -210,9 +267,16 @@ canvas.addEventListener('click',(e)=>{
      ))
 })
 
-//====--- main logic here-  addevent listener for heavyweapon--===
+//====--- main logic here addevent listener for heavyweapon--===
 canvas.addEventListener('contextmenu',(e)=>{
      e.preventDefault();
+     //===--rendering player score--==
+     if(playerscore<=0)return;
+     //===-- decreasing playerscore using heavyweapons--==
+     playerscore -= 2;
+     //---==updateing player score==--
+     scoreboard.innerHTML=`Score:${playerscore}`
+
      const MyAngle= Math.atan2(
           e.clientY-canvas.height/2,
           e.clientX-canvas.width/2,          
@@ -224,17 +288,44 @@ canvas.addEventListener('contextmenu',(e)=>{
      weapons.push(new Weapon(
           canvas.width/2,
           canvas.height/2,
-          12,
+          10,
           "pink",
           velocity,
           heavydamage
 
      ))
 })
+//====--- main logic here-addevent listener for huageweapon--===
+addEventListener('keypress',(e)=>{
+
+   if(e.key===" "){
+     if(playerscore<20)return;
+     playerscore -= 6;
+  scoreboard.innerHTML=`Score:${playerscore}`
+
+     huageweapons.push(new HuageWeapon(
+         0,
+         0, 
+         huagedamage
+     ))
+   }
+    
+})
+addEventListener('contextmenu',(e)=>{
+   e.preventDefault();
+  });
+
+  addEventListener('resize',(e)=>{
+       window.location.reload()
+  })
+
 //====---animation function here--====
 let InimationId
 function animation(){
   InimationId= requestAnimationFrame(animation);
+  //===--updating playerscore in scoreboard in html--==
+  scoreboard.innerHTML=`Score:${playerscore}`
+
   context.fillStyle="rgba(45,45,45,0.3)"   
    context.fillRect(0,0,canvas.width,canvas.height)
      player1.draw();
@@ -246,6 +337,16 @@ function animation(){
           partical.update();
           }
      })
+     //===---creating huageweapons===---
+     huageweapons.forEach((Huageweapon,Huageweaponindex)=>{
+          if(huageweapons.x>canvas.width){
+            huageweapons.splice(Huageweaponindex,1)
+          }else{
+               Huageweapon.update()
+          }
+      
+     })
+  //==--generating lighter weapons--===
      weapons.forEach((Weapon,WeaponIndex)=>{
       Weapon.update();
       
@@ -257,6 +358,18 @@ function animation(){
      });
      enmies.forEach((enemy,enemyIndex)=>{
           enemy.update()
+          huageweapons.forEach((huageweapon)=>{
+               const distancebetweenhuageweaponandenmies=huageweapon.x-enemy.x;
+          
+               if(distancebetweenhuageweaponandenmies<=200 && distancebetweenhuageweaponandenmies>=-200){
+                    //===--rendering player score--===
+                    playerscore +=10;
+                    scoreboard.innerHTML=`Score:${playerscore}`
+                    setTimeout(()=>{
+                         enmies.splice(enemyIndex,1)
+                       },0)
+               }
+             })
           weapons.forEach((weapon,weaponIndex)=>{
            //==--here find distance between weapons and enmies--==
                const Distance=Math.hypot(
@@ -266,6 +379,7 @@ function animation(){
                   //===--here end game if enemy hit player====---
                   if(Distance-player1.redius-enemy.redius<1){
                     cancelAnimationFrame(InimationId);
+                    return gameoverloader()
                   }
      //==--here find distance between enemy and weapons-==
         const distance=Math.hypot(
@@ -274,7 +388,7 @@ function animation(){
         )
         if(distance-weapon.redius-enemy.redius<1) {
           if(enemy.redius>20){
-          enemy.redius-= 15
+          enemy.redius-= 12
           weapons.splice(weaponIndex,1)
           }
        else{ 
@@ -290,6 +404,9 @@ function animation(){
                 }
                 ))
             }
+            playerscore +=10;
+            //==-- updating playerscore in scoreboard in html===--
+            scoreboard.innerHTML=`Score:${playerscore}`
         setTimeout(()=>{
           weapons.splice(weaponIndex,1)
           enmies.splice(enemyIndex,1)
@@ -297,7 +414,6 @@ function animation(){
      }
         }})
      })
-
 }
 animation()
 
