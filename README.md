@@ -1,7 +1,5 @@
 # Shooting-Game
 
-![Game Screenshot](/home/sanjaygupta/Pictures/Screenshots/Screenshot from 2023-08-01 01-36-34.png)
-
 ## Table of Contents
 
 - [Introduction](#introduction)
