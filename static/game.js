@@ -1,4 +1,4 @@
-﻿// Importing sound effects
+// Importing sound effects
 const shootingsong = new Audio("./Music/shooting.mp3");
 const killenemy = new Audio("./Music/killEnemy.mp3");
 const gameover = new Audio("./Music/gameOver.mp3");
