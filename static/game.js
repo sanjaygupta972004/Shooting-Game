@@ -1,5 +1,5 @@
 
-const socket = new WebSocket("ws://localhost:8000/ws");
+const socket = new WebSocket("https://space-shoot-production.up.railway.app/ws");
 
 
 let gameState = {
