@@ -55,7 +55,7 @@ func main() {
 	}
 
 	http.Handle("/", http.FileServer(http.Dir("static")))
-	//http.HandleFunc("/ws", handleConnections)
+	http.HandleFunc("/ws", handleConnections)
 
 	go handleBroadcast()
 
